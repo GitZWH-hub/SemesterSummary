@@ -4,6 +4,7 @@ from matplotlib.collections import LineCollection
 import pandas as pd
 from sklearn import cluster, covariance, manifold
 import sqlite3 as sql3
+import os
 
 plt.rcParams['font.sans-serif']=['Arial Unicode MS'] #用来正常显示中文标签
 plt.rcParams['axes.unicode_minus'] = False #用来正常显示负号
@@ -34,7 +35,8 @@ symbol_dict = {
     "ZN": "沪锌"
 }
 symbols, nameA = np.array(sorted(symbol_dict.items())).T
-DBNAME = 'DataBase/DBData'
+path = os.path.abspath(os.path.dirname(__file__))
+DBNAME = path + '/DataBase/DBData'
 conn = sql3.connect(DBNAME)
 
 for sysmbol in symbols:
@@ -74,7 +76,7 @@ sysmbol_dict_DCE = {
 }
 
 symbols, nameB = np.array(sorted(sysmbol_dict_DCE.items())).T
-DBNAME = 'DataBase/DBDataDCE'
+DBNAME = path + '/DataBase/DBDataDCE'
 conn = sql3.connect(DBNAME)
 for sysmbol in symbols:
     qry = 'select trade_date, open, close from {} where ts_code like \'%{}%\''
@@ -113,7 +115,7 @@ sysmbol_dict_CZCE = {
     "ZC": "动力煤"
 }
 symbols, nameC = np.array(sorted(sysmbol_dict_CZCE.items())).T
-DBNAME = 'DataBase/DBDataCZCE'
+DBNAME = path + '/DataBase/DBDataCZCE'
 conn = sql3.connect(DBNAME)
 for sysmbol in symbols:
     qry = 'select trade_date, open, close from {} where ts_code like \'%{}%\''

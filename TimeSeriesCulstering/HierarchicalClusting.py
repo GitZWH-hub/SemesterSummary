@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import argparse
 from tqdm import tqdm
 from scipy.cluster.hierarchy import linkage, dendrogram
+import os
+plt.rcParams['font.sans-serif']=['Arial Unicode MS'] #用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False #用来正常显示负号
 
 
 def TimeSeriesSimilarity(s1, s2):
@@ -25,10 +28,12 @@ def TimeSeriesSimilarity(s1, s2):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-w', '--window', type=int, default=10)
+    parser.add_argument('-n', '--nums', type=int, default=20)
     args = parser.parse_args()
 
     '''（1）首先获取所有的时间序列'''
-    DBNAME = '/Users/zhangwh/Desktop/量化/TimeSeriesCulstering/DBData'
+    path = os.path.abspath(os.path.dirname(__file__))
+    DBNAME = path + '/DataBase/HiDBData'
     conn = sql3.connect(DBNAME)
 
     qry = 'select *from CU'
@@ -37,7 +42,6 @@ if __name__ == '__main__':
     ts_code_column_uniques = data['ts_code'].unique()   # 把tscode列取出做一个array
     df_dict = {}
     for ts_code_column in tqdm(ts_code_column_uniques):
-        print(ts_code_column)
         df_temp = data[data['ts_code'].isin([ts_code_column])]
         # 只保留两列
         df_temp = df_temp[['trade_date', 'close']]
@@ -61,7 +65,7 @@ if __name__ == '__main__':
     '''（4）'''
     # 有了基线之后，可以从基线中提取时间序列特征然后利用常用的knn等进行分类。
     # 或者使用kmeans等方法来聚类(使用时间序列相似度来聚类(层次聚类)，具体使用动态规划的dtw)
-    keys = list(df_dict.keys())[:100]
+    keys = list(df_dict.keys())[:args.nums]
     length = len(keys)
     dist = np.zeros((length, length))
     for i in tqdm(range(0, length)):
@@ -72,15 +76,17 @@ if __name__ == '__main__':
 
     # # 以pandas.dataframe保存到文件中
     df = pd.DataFrame(dist)
-    df.to_csv('csv/' + str(length) + '_len.csv')
 
-    df = pd.read_csv('csv/' + str(length) + '_len.csv', index_col=0, sep=',')
+    csv_path = path + '/csv/' + str(length) + '_len.csv'
+    df.to_csv(csv_path)
+
+    df = pd.read_csv(csv_path)
 
     results_clusters = linkage(df.values, method='complete', metric='euclidean')
     clusters = pd.DataFrame(results_clusters, columns=['label1', 'label2', 'distance', 'sampleSize'],
                             index=['clusters %d'%(i+1) for i in range(results_clusters.shape[0])])
 
-    clusters.to_csv('csv/result.csv')
+    clusters.to_csv(path + '/csv/result.csv')
 
     dendr = dendrogram(results_clusters)
     plt.show()
