@@ -12,4 +12,5 @@
 2. 数据集：同一CU品种、不同截止日期的时间序列之间的聚类，如（CU2101、CU2102、CU1910）
 3. 结果：相邻截止日期的合约最先聚，如下图的CU1801、CU1802的曲线：
 ![Zhang Weihua](https://github.com/GitZWH-hub/SemesterSummary/blob/main/TimeSeriesCulstering/PNG/Futures.png)
+![Zhang Weihua](https://github.com/GitZWH-hub/SemesterSummary/blob/main/TimeSeriesCulstering/PNG/Hiresult.png)
 4. 时间序列间相似度矩阵持久化到csv文件中
